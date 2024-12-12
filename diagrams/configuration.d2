@@ -1,0 +1,21 @@
+canint: Kvaser Interface
+pc: PC {
+	app: "Python App"
+}
+
+car: "Car" {
+	atc: ATC
+	vcu: VCU
+	bms: BMS
+	bus: "CAN bus" {
+		height: 300
+	}
+}
+
+
+pc <-> canint: USB
+direction: right
+canint <-> car.bus: "CAN"
+car.bus <-> car.atc: "CAN"
+car.bus <-> car.vcu: "CAN"
+car.bus <-> car.bms: "CAN"
