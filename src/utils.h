@@ -9,6 +9,8 @@
 #define RECR 0x4005084E
 // CAN Transmit Error Counter Register
 #define TECR 0x4005084F
+// CAN Message Control Register for Transmit Mailbox 0
+#define MCTL_TX0 0x40050820
 
 float msg_duration_micros(const uint32_t bps, const uint8_t dlc);
 
@@ -62,6 +64,8 @@ T scaleperci(T value, uint8_t perc) {
 }
 
 void log_error_counters();
+
+void send_traffic(const CanMsg messages[], uint32_t len);
 
 
 #endif
