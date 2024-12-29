@@ -5,6 +5,9 @@
 
 #include "src/utils.h"
 
+// Period sync samples
+uint64_t samples[CONFIG.sync.samples];
+
 void setup()
 {
 
@@ -20,7 +23,6 @@ void setup()
     Synchronise with victim's message by measuring the transmission period and jitter
   */
 
-  uint64_t samples[CONFIG.sync.samples];
 
   // Synchronise at the beginning
   Serial.print("Attempting synchronisation...");

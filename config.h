@@ -56,7 +56,7 @@ constexpr Config CONFIG = {
       }
     },
     .sync = {
-      .samples = 5000,
+      .samples = 2000,
       .tries = 1000,
       .scale = 120 
     },

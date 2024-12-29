@@ -10,7 +10,7 @@
 // CAN Transmit Error Counter Register
 #define TECR 0x4005084F
 
-float msg_duration_micros(const uint32_t bps, const uint8_t dlc);
+uint64_t msg_duration_micros(const uint32_t bps, const uint8_t dlc);
 
 template<typename T>
 T avg(const T data[], const unsigned int len) {
