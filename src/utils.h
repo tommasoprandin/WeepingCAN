@@ -12,7 +12,7 @@
 // CAN Message Control Register for Transmit Mailbox 0
 #define MCTL_TX0 0x40050820
 
-float msg_duration_micros(const uint32_t bps, const uint8_t dlc);
+uint64_t msg_duration_micros(const uint32_t bps, const uint8_t dlc);
 
 template<typename T>
 T avg(const T data[], const unsigned int len) {

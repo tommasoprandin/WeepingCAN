@@ -5,6 +5,12 @@
 
 #include "src/utils.h"
 
+// Sync samples buffer
+static uint64_t samples[CONFIG.sync.samples];
+
+// Build array containing "normal messages" as specified by the config
+static CanMsg traffic[CONFIG.messages.traffic_msgs];
+
 void setup()
 {
 
@@ -19,8 +25,6 @@ void setup()
   /*
     Synchronise with victim's message by measuring the transmission period and jitter
   */
-
-  uint64_t samples[CONFIG.sync.samples];
 
   // Synchronise at the beginning
   Serial.print("Attempting synchronisation...");
@@ -72,8 +76,6 @@ void setup()
   CanMsg malicious_msg = {CONFIG.messages.tampered.id, CONFIG.messages.tampered.dlc, recessive_data_mali};
   Serial.println("Malicious messages fabricated");
 
-  // Build array containing "normal messages" as specified by the config
-  CanMsg traffic[CONFIG.messages.traffic_msgs];
 
   for (int i = 0; i < CONFIG.messages.traffic_msgs; i++) {
     traffic[i] = CanMsg(CONFIG.messages.traffic[i].id, CONFIG.messages.traffic[i].dlc, nullptr);

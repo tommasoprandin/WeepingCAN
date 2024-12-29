@@ -1,13 +1,9 @@
 #include "utils.h"
 
-float msg_duration_micros(const uint32_t bps, const uint8_t dlc)
-{
-
-  constexpr uint8_t CAN_FRAME_OVH = 1 + 11 + 1 + 1 + 1 + 4 + 15 + 1 + 1 + 1 + 7 + 3;
-  float bpus = bps / 1e9;
-  auto frame_bits = CAN_FRAME_OVH + (dlc * 8);
-
-  return frame_bits / bpus;
+uint64_t msg_duration_micros(const uint32_t bps, const uint8_t dlc) {
+  constexpr uint8_t CAN_FRAME_OVH = 47; // Sum of all overhead bits
+  uint64_t frame_bits = CAN_FRAME_OVH + (dlc * 8ULL);
+  return (frame_bits * 1000000ULL) / bps;
 }
 
 bool synchronise(uint16_t can_id, int max_tries)
@@ -85,13 +81,13 @@ void attack(CanMsg &preceding, CanMsg &tampered)
 void log_error_counters()
 {
   // Direct register access since the library does not support them yet
-  auto tec = *((volatile uint32_t *)TECR);
-  auto rec = *((volatile uint32_t *)RECR);
+  auto tec = *((volatile uint8_t *)TECR);
+  auto rec = *((volatile uint8_t *)RECR);
   Serial.println("TEC:" + String(tec) + ",REC:" + String(rec));
 }
 
 void send_traffic(const CanMsg messages[], uint32_t len) {
-  for (int i = 0; i < len; len++) {
+  for (int i = 0; i < len; i++) {
     if (CAN.write(messages[i]) < 0) {
       Serial.println("Failed to send normal traffic message with id " + messages[i].id);
     }
