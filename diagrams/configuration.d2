@@ -1,21 +1,36 @@
-canint: Kvaser Interface
 pc: PC {
-	app: "Python App"
+  app: "Serial logger"
 }
 
 car: "Car" {
-	atc: ATC
-	vcu: VCU
-	bms: BMS
-	bus: "CAN bus" {
-		height: 300
-	}
+  atc: ATC
+  vcu: VCU
+  bms: BMS
+  smu: SMU
+  bus: "CAN bus" {
+    height: 300
+  }
 }
 
+car.smu: {
+  style: {
+    stroke: red
+    fill: salmon
+  }
+}
 
-pc <-> canint: USB
+car.atc: {
+  style: {
+    stroke: darkorange
+    fill: lightsalmon
+  }
+}
+
 direction: right
-canint <-> car.bus: "CAN"
 car.bus <-> car.atc: "CAN"
 car.bus <-> car.vcu: "CAN"
 car.bus <-> car.bms: "CAN"
+car.bus <-> car.smu: "CAN"
+
+car.atc -> pc: "Serial"
+car.smu -> pc: "Serial"
