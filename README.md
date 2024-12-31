@@ -1,9 +1,11 @@
 # WeepingCAN
 An implementation of the WeepingCAN attack (_Bloom, Gedare. "WeepingCAN: A stealthy CAN bus-off attack." Workshop on Automotive and Autonomous Vehicle Security. 2021., [link](https://par.nsf.gov/servlets/purl/10283597)_) on a Formula Student car from the Università degli Studi di Padova.
 
+The branch [busoff](https://github.com/tommasoprandin/WeepingCAN/tree/busoff) contains the code for the bus-off attack, while the [weeping-can](https://github.com/tommasoprandin/WeepingCAN/tree/weeping-can) contains the code for the WeepingCAN attack.
+
 ## Hardware
 
-The hardware used is the Kvaser Memorator Pro 2xHS v2, which will be used to connect the PC on the CAN bus of the car to run the attack.
+The hardware used is a PC running the serial logger and monitor from the [Arduino 2 IDE](https://www.arduino.cc/en/software), and the IDE itself for programming the boards.
 
 The car is the RGe-07 from the Formula Student Team of the Università degli Studi di Padova (RaceUP team).
 
